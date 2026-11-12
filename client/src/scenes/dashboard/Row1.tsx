@@ -14,6 +14,18 @@ type Props = {}
 const Row1 = (props: Props) => {
     const { data }= useGetKpisQuery();
     console.log("data:",data);
+    const revenueExpenses=useMemo(()=>{
+        return (
+            data &&
+            data[0].monthlyData.map(({moonth,revenue,expenses})=>{
+                return {
+                    name: month.substring(0,3),
+                    revenue: revenue,
+                    expenses: expenses,
+                }
+            })
+        );
+    },[data]);
   return (
     <>
         <DashboardBox sx={{ gridArea: "a", }}> 
