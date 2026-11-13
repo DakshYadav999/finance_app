@@ -1,22 +1,20 @@
-import express from "express";      //Creates and manages your backend server- 	The server framework
-import bodyParser from "body-parser";//Parses incoming request bodies-	A data reader
-import mongoose from "mongoose";     //	Connects to MongoDB and works with database data - 	Database assistant
-import cors from "cors";            //	Controls cross-origin browser access - 	A permission mechanism
-import dotenv from "dotenv";        //	Loads variables from .env - 	Configuration loader
-import helmet from "helmet";        //	Adds security-related HTTP headers - Basic security layer
-import morgan from "morgan";        //	Logs incoming HTTP requests - 	A request logger
-import kpiRoutes from "./routes/kpi.js"; // Handles KPI-related API endpoints - 	KPI route handler
-import KPI from "./models/KPI.js";  // Represents the KPI data model - 	KPI data structure
-import { kpis } from "./data/data.js"; // Sample KPI data for testing - 	Mock data    
 
-
-//ROUTES
-app.use("/kpi", kpiRoutes);             // Mounts the KPI routes at the /kpi path - 	API route configuration
+import express from "express";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import morgan from "morgan";
+import kpiRoutes from "./routes/kpi.js";
+import KPI from "./models/KPI.js";
+import { kpis } from "./data/data.js";
 
 // CONFIGURATIONS
-
 dotenv.config();
-const app=express(); 
+
+const app = express();
+
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
@@ -25,16 +23,28 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-//Mongoose setup
+// ROUTES
+app.use("/kpi", kpiRoutes);
 
-const PORT=process.env.PORT || 9000;
+// MONGOOSE SETUP
+const PORT = process.env.PORT || 9000;
+
 mongoose.connect(process.env.MONGO_URL)
     .then(async () => {
-        app.listen(PORT,()=>{ console.log(`Server Port : ${ PORT}`)})
+        app.listen(PORT, () => {
+            console.log(`Server Port : ${PORT}`);
+        });
 
-        //Add data one time only or as needed
+        // Add data one time only or as needed
         // await mongoose.connection.db.dropDatabase();
-        // KPI.insertMany(kpis); 
+        // KPI.insertMany(kpis);
+        // Add sample KPI data only if the collection is empty
+        const existingKpis = await KPI.countDocuments();
+
+    if (existingKpis === 0) {
+        await KPI.insertMany(kpis);
+        console.log("Sample KPI data inserted");
+    }
     })
     .catch((error) => {
         console.error("MongoDB connection failed:", error);
