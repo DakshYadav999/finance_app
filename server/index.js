@@ -9,7 +9,7 @@ import morgan from "morgan";
 import kpiRoutes from "./routes/kpi.js";
 import KPI from "./models/KPI.js";
 import productRoutes from "./routes/product.js";
-import transactionRoutesion from "./routes/transaction.js"
+import transactionRoutes from "./routes/transaction.js"
 import Product from "./models/Product.js";
 import Transaction from "./models/Transaction.js"
 import { kpis,products,transactions } from "./data/data.js";
@@ -46,6 +46,7 @@ mongoose.connect(process.env.MONGO_URL)
         // KPI.insertMany(kpis);
         // Add sample KPI data only if the collection is empty
         //Product.insertMany(products);
+        //Transaction.insertMany(transactions);
         const existingKpis = await KPI.countDocuments();
 
     if (existingKpis === 0) {
