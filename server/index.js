@@ -42,11 +42,11 @@ mongoose.connect(process.env.MONGO_URL)
         });
 
         // Add data one time only or as needed
-        // await mongoose.connection.db.dropDatabase();
+        //  await mongoose.connection.db.dropDatabase();
         // KPI.insertMany(kpis);
-        // Add sample KPI data only if the collection is empty
-        //Product.insertMany(products);
-        //Transaction.insertMany(transactions);
+        // // Add sample KPI data only if the collection is empty
+        // Product.insertMany(products);
+        // Transaction.insertMany(transactions);
         const existingKpis = await KPI.countDocuments();
 
     if (existingKpis === 0) {

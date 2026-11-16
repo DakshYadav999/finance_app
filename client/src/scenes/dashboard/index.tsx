@@ -11,7 +11,6 @@ const gridTemplateLargeScreens = `
     "d e f"
     "d h i"
     "g h i"
-    "g h i"
     "g h j"
     "g h j"
 `;
@@ -62,7 +61,7 @@ const Dashboard = () => {
             ? {
                 gridTemplateAreas: gridTemplateLargeScreens,
                 gridTemplateColumns: "repeat(3, minmax(370px, 1fr))",
-                gridTemplateRows: "repeat(11, minmax(60px, 1fr))",
+                gridTemplateRows: "repeat(10, minmax(60px, 1fr))",
             }
             : {
                 gridAutoColumns: "1fr",
