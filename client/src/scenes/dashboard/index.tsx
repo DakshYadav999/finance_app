@@ -2,6 +2,7 @@ import { Box, useMediaQuery } from '@mui/material';
 import Row1 from './Row1';
 import Row2 from './Row2';
 import Row3 from './Row3';
+import BudgetTracker from "./BudgetTracker";
 const gridTemplateLargeScreens = `
     "a b c"
     "a b c"
@@ -51,6 +52,8 @@ const Dashboard = () => {
     const isAboveMediumScreens = useMediaQuery("(min-width: 1200px)");
 
     return (
+    <>
+           <BudgetTracker />
         <Box
     sx={{
         width: "100%",
@@ -74,6 +77,8 @@ const Dashboard = () => {
             <Row2 />
             <Row3 />
         </Box>
+  
+    </>
     );
 };
 
