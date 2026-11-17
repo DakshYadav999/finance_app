@@ -8,6 +8,7 @@ import {
 } from "@/state/api";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import type { GridRenderCellParams } from "@mui/x-data-grid";
 import React, { useMemo, useState } from "react";
 import {
   CartesianGrid,
@@ -22,6 +23,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+const errorMessage = (err: unknown, fallback: string) =>
+  (err as { data?: { message?: string } })?.data?.message ?? fallback;
 
 const Statement = () => {
   const { palette } = useTheme();
@@ -44,8 +48,8 @@ const Statement = () => {
           : `Imported ${result.inserted} new transactions` +
               (result.skipped ? ` (${result.skipped} duplicates skipped).` : ".")
       );
-    } catch (err: any) {
-      setMessage(err?.data?.message ?? "Upload failed. Check the CSV format.");
+    }  catch (err) {
+      setMessage(errorMessage(err, "Upload failed. Check the CSV format."));
     }
     e.target.value = "";
   };
@@ -60,7 +64,7 @@ const Statement = () => {
       field: "date",
       headerName: "Date",
       flex: 0.6,
-      renderCell: (params: any) => new Date(params.value).toLocaleDateString(),
+      renderCell: (params: GridRenderCellParams) => new Date(params.value).toLocaleDateString(),
     },
     { field: "description", headerName: "Description", flex: 1.5 },
     { field: "category", headerName: "Category", flex: 0.6 },
@@ -69,11 +73,13 @@ const Statement = () => {
       field: "amount",
       headerName: "Amount",
       flex: 0.5,
-      renderCell: (params: any) => `₹${params.value}`,
+      renderCell: (params: GridRenderCellParams) => `₹${params.value}`,
     },
   ];
 
   const hasData = (txns?.length ?? 0) > 0;
+  // NEW: demo mode is switched on by VITE_DEMO_MODE=true (set on Vercel only)
+  const isDemo = import.meta.env.VITE_DEMO_MODE === "true";
 
     const summary = useMemo(() => {
     const list = txns ?? [];
@@ -109,16 +115,36 @@ const Statement = () => {
   return (
     <Box sx={{ display: "grid", gap: "1.5rem", p: "1rem" }}>
       <DashboardBox sx={{ p: "1rem" }}>
-        <Typography variant="h3" mb="0.5rem">
+        <Typography variant="h3" sx={{ mb: "0.5rem" }}>
           Import your bank statement
         </Typography>
-        <Typography variant="h6" mb="1rem">
+        <Typography variant="h6" sx={{ mb: "1rem" }}>
           Upload a CSV export from your bank. No CSV handy? Download the sample
           and upload it to see how it works.
         </Typography>
 
+        {/* NEW: public demo notice */}
+        {isDemo && (
+          <Box
+            sx={{
+              mb: "1rem",
+              p: "0.75rem 1rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #fbbf24",
+            }}
+          >
+            <Typography variant="h6" sx={{ color: "#fbbf24" }}>
+              Public demo: importing and deleting are disabled so the shared
+              sample data stays intact. Please don't enter real financial
+              information anywhere in this app. To try your own CSV, run the
+              project locally from the GitHub repo.
+            </Typography>
+          </Box>
+        )}
+
         <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-          <Button variant="contained" component="label" disabled={isLoading}>
+          {/* CHANGED: also disabled in demo mode */}
+          <Button variant="contained" component="label" disabled={isLoading || isDemo}>
             {isLoading ? "Uploading..." : "Choose CSV file"}
             <input hidden type="file" accept=".csv" onChange={onFileChange} />
           </Button>
@@ -134,9 +160,15 @@ const Statement = () => {
             <Button
               variant="text"
               color="error"
+              disabled={isDemo}
               onClick={async () => {
-                await clearStatement();
-                setMessage("Imported data cleared.");
+                // CHANGED: shows an error message instead of a false "cleared" message
+                try {
+                  await clearStatement().unwrap();
+                  setMessage("Imported data cleared.");
+                } catch (err) {
+                setMessage(errorMessage(err, "Could not clear data."));
+              }
               }}
             >
               Clear data
@@ -215,7 +247,7 @@ const Statement = () => {
                 {money(summary.spent)}
               </text>
               <Tooltip
-                formatter={(v: number) => money(v)}
+                formatter={(v) => money(Number(v))}
                 contentStyle={{
                   backgroundColor: palette.grey[900],
                   border: "none",

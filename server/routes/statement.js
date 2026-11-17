@@ -9,6 +9,15 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
+// NEW: public demo protection. Writes are blocked unless ALLOW_STATEMENT_WRITES=true
+const blockPublicWrites = (req, res, next) => {
+  if (process.env.ALLOW_STATEMENT_WRITES === "true") return next();
+  return res.status(403).json({
+    message:
+      "This is a public demo: importing and deleting statement data is disabled.",
+  });
+};
+
 const RULES = [
   [/swiggy|zomato|restaurant|cafe|food/i, "Food"],
   [/uber|ola|irctc|metro|fuel|petrol/i, "Travel"],
@@ -39,7 +48,8 @@ const pick = (row, regex) => {
 };
 
 // POST /statement/upload
-router.post("/upload", upload.single("file"), async (req, res) => {
+// CHANGED: blockPublicWrites runs before multer
+router.post("/upload", blockPublicWrites, upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
@@ -106,7 +116,8 @@ router.get("/", async (req, res) => {
 });
 
 // DELETE /statement  (clears imported data so the demo can be reset)
-router.delete("/", async (req, res) => {
+// CHANGED: protected by blockPublicWrites
+router.delete("/", blockPublicWrites, async (req, res) => {
   try {
     await StatementTxn.deleteMany({});
     res.json({ message: "Cleared" });

@@ -25,7 +25,21 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
+
+// CHANGED: CORS now only allows CLIENT_URL (plus localhost when not in production)
+const allowedOrigins = [process.env.CLIENT_URL?.replace(/\/+$/, "")].filter(Boolean);
+if (process.env.NODE_ENV !== "production") {
+  allowedOrigins.push("http://localhost:5173", "http://127.0.0.1:5173");
+}
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // no Origin header = curl/Postman/server-to-server, so allow it
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(null, false);
+    },
+  })
+);
 
 // ROUTES
 app.use("/kpi", kpiRoutes);

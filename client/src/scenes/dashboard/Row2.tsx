@@ -4,7 +4,7 @@ import DashboardBox from "@/components/DashboardBox";
 import FlexBetween from "@/components/FlexBetween";
 import { useGetKpisQuery, useGetProductsQuery } from "@/state/api";
 import { Box, Typography, useTheme } from "@mui/material";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   Tooltip,
   CartesianGrid,
@@ -120,7 +120,7 @@ const operationalExpenses = useMemo(() => {
                 paddingAngle={2}
                 dataKey="value"
               >
-                {pieData.map((entry, index) => (
+                {pieData.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={pieColors[index]}

@@ -10,7 +10,7 @@ import {
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridCellParams } from "@mui/x-data-grid";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Cell, Pie, PieChart } from "recharts";
 
 const Row3 = () => {
@@ -219,7 +219,7 @@ const Row3 = () => {
     sideText="+4%"
   />
 
-  <FlexBetween mt="0.25rem" gap="0.5rem" p="0 1rem" textAlign="center">
+    <FlexBetween sx={{ mt: "0.25rem", gap: "0.5rem", p: "0 1rem", textAlign: "center" }}>
     {pieChartData.slice(0, 3).map((data, i) => (
       <Box
         key={`${data[0].name}-${i}`}
@@ -234,7 +234,7 @@ const Row3 = () => {
             paddingAngle={2}
             dataKey="value"
           >
-            {data.map((entry, index) => (
+            {data.map((_entry, index) => (
               <Cell key={`cell-${index}`} fill={pieColors[index]} />
             ))}
           </Pie>
