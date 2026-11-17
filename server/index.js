@@ -1,4 +1,4 @@
-
+import statementRoutes from "./routes/statement.js";
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
@@ -31,6 +31,7 @@ app.use(cors());
 app.use("/kpi", kpiRoutes);
 app.use("/product", productRoutes)
 app.use("/transaction",transactionRoutes)
+app.use("/statement", statementRoutes);
 
 // MONGOOSE SETUP
 const PORT = process.env.PORT || 9000;
