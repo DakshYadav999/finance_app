@@ -56,18 +56,28 @@ mongoose.connect(process.env.MONGO_URL)
             console.log(`Server Port : ${PORT}`);
         });
 
-        // Add data one time only or as needed
-        //  await mongoose.connection.db.dropDatabase();
-        // KPI.insertMany(kpis);
-        // // Add sample KPI data only if the collection is empty
-        // Product.insertMany(products);
-        // Transaction.insertMany(transactions);
-        const existingKpis = await KPI.countDocuments();
+       // Seed sample data only when collections are empty
+const existingKpis = await KPI.countDocuments();
 
-    if (existingKpis === 0) {
-        await KPI.insertMany(kpis);
-        console.log("Sample KPI data inserted");
-    }
+if (existingKpis === 0) {
+    await KPI.insertMany(kpis);
+    console.log("Sample KPI data inserted");
+}
+
+const existingProducts = await Product.countDocuments();
+
+if (existingProducts === 0) {
+    await Product.insertMany(products);
+    console.log("Sample Product data inserted");
+}
+
+const existingTransactions = await Transaction.countDocuments();
+
+if (existingTransactions === 0) {
+    await Transaction.insertMany(transactions);
+    console.log("Sample Transaction data inserted");
+}
+
     })
     .catch((error) => {
         console.error("MongoDB connection failed:", error);
